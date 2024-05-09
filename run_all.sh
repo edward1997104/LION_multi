@@ -1,3 +1,3 @@
-bash run_inferece.sh chair
-bash run_inferece.sh airplane
-bash run_inferece.sh car
+bash run_inference.sh chair
+bash run_inference.sh airplane
+bash run_inference.sh car
