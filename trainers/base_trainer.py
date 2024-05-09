@@ -510,7 +510,10 @@ class BaseTrainer(ABC):
         logger.info('save as %s' % output_name)
         if self.args.global_rank == 0:
             for idx in range(gen_pcs.shape[0]):
-                path = output_name.replace('.pt', f'_{idx}.ply')
+                save_pcs_dir = os.path.join(
+                    self.cfg.save_dir, f'sample_pcs_{ddim_step}')
+                os.makedirs(save_pcs_dir, exist_ok=True)
+                path = os.path.join(save_pcs_dir, f'{idx}.ply')
                 save_ply_file(gen_pcs[idx].cpu().numpy(), path)
                 print("Saved sample file: ", path)
 
