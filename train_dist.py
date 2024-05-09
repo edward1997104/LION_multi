@@ -157,8 +157,13 @@ def get_args():
                         default=None,
                         type=str,
                         help="Pretrained cehckpoint")
+    parser.add_argument('--eval_ddim_step',
+                        default=None,
+                        type=int,
+                        help="ddim")
 
     args = parser.parse_args()
+
 
     # update config
     if args.eval_generation or args.resume:
@@ -213,6 +218,9 @@ def get_args():
     elif args.eval_generation:
         logger.add(config.log_dir + '/eval_gen.log')
     logger.info('log dir: {}', config.log_dir)
+
+    if args.eval_ddim_step is not None:
+        config.eval_ddim_step = args.eval_ddim_step
 
     return args, config
 
