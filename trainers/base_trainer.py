@@ -27,6 +27,25 @@ from utils.eval_helper import compute_NLL_metric
 from utils.utils import AvgrageMeter
 import clip
 
+
+def save_ply_file(points, filename):
+    """
+    Save a point cloud to a PLY file.
+
+    Parameters:
+    - filename (str): The output PLY file name.
+    - points (numpy.ndarray): A Nx3 NumPy array representing the point cloud.
+
+    Returns:
+    - None
+    """
+    header = "ply\nformat ascii 1.0\nelement vertex {}\nproperty float x\nproperty float y\nproperty float z\nend_header".format(len(points))
+
+    with open(filename, 'w') as ply_file:
+        ply_file.write(header + '\n')
+        for point in points:
+            ply_file.write('{} {} {}\n'.format(point[0], point[1], point[2]))
+
 class BaseTrainer(ABC):
     def __init__(self, cfg, args):
         self.cfg, self.args = cfg, args
@@ -475,6 +494,7 @@ class BaseTrainer(ABC):
                     x.shape[-1] == input_dim), f'expect x: B,N,{input_dim}; get {x.shape}'
                 index_start = index_start + batch_size_test
                 gen_pcs.append(x.detach().cpu())
+                print(i, ' batch generated')
 
             gen_pcs = torch.cat(gen_pcs, dim=0)
         if self.args.distributed:
@@ -489,6 +509,11 @@ class BaseTrainer(ABC):
                         gen_pcs.shape, self.args.global_rank)
         logger.info('save as %s' % output_name)
         if self.args.global_rank == 0:
+            for idx in range(gen_pcs.shape[0]):
+                path = output_name.replace('.pt', f'_{idx}.ply')
+                save_ply_file(gen_pcs[idx].cpu().numpy(), path)
+                print("Saved sample file: ", path)
+
             torch.save(gen_pcs, output_name)
         else:
             logger.info('return for rank {}', self.args.global_rank)
@@ -512,7 +537,7 @@ class BaseTrainer(ABC):
         shape_str = '{}: gen_pcs: {}'.format(self.cfg.save_dir, gen_pcs.shape)
         logger.info(shape_str)
 
-        ref = get_ref_pt(self.cfg.data.cates, self.cfg.data.type)
+        ref = None
         if ref is None:
             logger.info('Not computing score')
             return 1
