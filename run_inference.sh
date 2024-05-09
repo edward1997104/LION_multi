@@ -1,0 +1,7 @@
+python train_dist.py --skip_nll 1 --eval_generation --pretrained ../lion_ckpt/unconditional/$1/checkpoints/model.pt ddpm.model_var_type "fixedlarge" data.batch_size_test 16 ddpm.ema 1 num_val_samples 3 eval_ddim_step 1
+python train_dist.py --skip_nll 1 --eval_generation --pretrained ../lion_ckpt/unconditional/$1/checkpoints/model.pt ddpm.model_var_type "fixedlarge" data.batch_size_test 16 ddpm.ema 1 num_val_samples 3 eval_ddim_step 20
+python train_dist.py --skip_nll 1 --eval_generation --pretrained ../lion_ckpt/unconditional/$1/checkpoints/model.pt ddpm.model_var_type "fixedlarge" data.batch_size_test 16 ddpm.ema 1 num_val_samples 3 eval_ddim_step 50
+python train_dist.py --skip_nll 1 --eval_generation --pretrained ../lion_ckpt/unconditional/$1/checkpoints/model.pt ddpm.model_var_type "fixedlarge" data.batch_size_test 16 ddpm.ema 1 num_val_samples 3 eval_ddim_step 100
+python train_dist.py --skip_nll 1 --eval_generation --pretrained ../lion_ckpt/unconditional/$1/checkpoints/model.pt ddpm.model_var_type "fixedlarge" data.batch_size_test 16 ddpm.ema 1 num_val_samples 3 eval_ddim_step 500
+python train_dist.py --skip_nll 1 --eval_generation --pretrained ../lion_ckpt/unconditional/$1/checkpoints/model.pt ddpm.model_var_type "fixedlarge" data.batch_size_test 16 ddpm.ema 1 num_val_samples 3 eval_ddim_step 1000
+python train_dist.py --skip_nll 1 --eval_generation --pretrained ../lion_ckpt/unconditional/$1/checkpoints/model.pt ddpm.model_var_type "fixedlarge" data.batch_size_test 16 ddpm.ema 1 num_val_samples 3 eval_ddim_step 0
