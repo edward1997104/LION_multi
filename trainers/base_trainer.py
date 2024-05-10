@@ -403,6 +403,7 @@ class BaseTrainer(ABC):
         batch_size_test = self.cfg.data.batch_size_test
         input_dim = self.cfg.ddpm.input_dim
         ddim_step = self.cfg.eval_ddim_step
+        print("ddim step: ", ddim_step)
         device = model_helper.get_device(self.model)
         test_loader = self.test_loader
         test_size = batch_size_test * len(test_loader)
