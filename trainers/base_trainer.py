@@ -407,6 +407,12 @@ class BaseTrainer(ABC):
         device = model_helper.get_device(self.model)
         test_loader = self.test_loader
         test_size = batch_size_test * len(test_loader)
+
+        ### get mean and std
+        for data in test_loader:
+            mean, std = data['mean'][0:1], data['std'][0:1]
+            break
+
         sample_num_points = self.cfg.data.tr_max_sample_points
         cates = self.cfg.data.cates
         num_ref = get_ref_num(
@@ -476,8 +482,6 @@ class BaseTrainer(ABC):
             logger.info('Rank={}, num_gen_iter: {}; num_ref={}, batch_size_test={}',
                         self.args.global_rank, num_gen_iter, num_ref, batch_size_test)
             seed = self.cfg.trainer.seed
-            batch = get_ref_pt(self.cfg.data.cates, self.cfg.data.type)
-            mean, std = batch['mean'], batch['std']
             for i in range(0, num_gen_iter):
                 torch.manual_seed(seed + i)
                 np.random.seed(seed + i)
