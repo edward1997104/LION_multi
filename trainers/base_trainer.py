@@ -475,6 +475,8 @@ class BaseTrainer(ABC):
             logger.info('Rank={}, num_gen_iter: {}; num_ref={}, batch_size_test={}',
                         self.args.global_rank, num_gen_iter, num_ref, batch_size_test)
             seed = self.cfg.trainer.seed
+            batch = get_ref_pt(self.cfg.data.cates, self.cfg.data.type)
+            mean, std = batch['mean'], batch['std']
             for i in range(0, num_gen_iter):
                 torch.manual_seed(seed + i)
                 np.random.seed(seed + i)
@@ -490,6 +492,8 @@ class BaseTrainer(ABC):
                                 device_str=device.type,
                                 for_vis=False,
                                 ddim_step=ddim_step).permute(0, 2, 1).contiguous()  # B,3,N->B,N,3
+                x = x * std + mean
+
                 assert(
                     x.shape[-1] == input_dim), f'expect x: B,N,{input_dim}; get {x.shape}'
                 index_start = index_start + batch_size_test
