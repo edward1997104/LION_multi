@@ -91,9 +91,9 @@ def main(args, config):
         logger.info('save as : {}', save_file)
         # vis sampled output
         if not args.skip_sample:
-            trainer.vis_sample(num_vis=8, writer=trainer.writer,
-                               step=trainer.step, include_pred_x0=False,
-                               save_file=save_file)
+            # trainer.vis_sample(num_vis=8, writer=trainer.writer,
+            #                    step=trainer.step, include_pred_x0=False,
+            #                    save_file=save_file)
             trainer.eval_sample(trainer.step)
         logger.info('done')
 
