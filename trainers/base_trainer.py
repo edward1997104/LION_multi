@@ -410,7 +410,7 @@ class BaseTrainer(ABC):
 
         ### get mean and std
         for data in test_loader:
-            mean, std = data['mean'][0:1], data['std'][0:1]
+            mean, std = data['mean'][0:1].to(device), data['std'][0:1].to(device)
             break
 
         sample_num_points = self.cfg.data.tr_max_sample_points
