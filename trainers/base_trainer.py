@@ -409,9 +409,12 @@ class BaseTrainer(ABC):
         test_size = batch_size_test * len(test_loader)
 
         ### get mean and std
-        for data in test_loader:
-            mean, std = data['mean'][0:1].to(device), data['std'][0:1].to(device)
-            break
+        # for data in test_loader:
+        #     mean, std = data['mean'][0:1].to(device), data['std'][0:1].to(device)
+        #     break
+        ref_name = get_ref_pt(self.cfg.data.cates, self.cfg.data.type)
+        ref = torch.load(ref_name)
+        mean, std  = ref['mean'][0:1].to(device), ref['std'][0:1].to(device)
 
         sample_num_points = self.cfg.data.tr_max_sample_points
         cates = self.cfg.data.cates
