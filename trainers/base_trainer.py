@@ -521,7 +521,7 @@ class BaseTrainer(ABC):
                         gen_pcs.shape, self.args.global_rank)
         logger.info('save as %s' % output_name)
         if self.args.global_rank == 0:
-            gen_pcs_scaled = gen_pcs * std + mean
+            gen_pcs_scaled = gen_pcs * std.cpu() + mean.cpu()
             for idx in range(gen_pcs.shape[0]):
                 save_pcs_dir = os.path.join(
                     self.cfg.save_dir, f'sample_pcs_{ddim_step}')
