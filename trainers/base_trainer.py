@@ -554,6 +554,7 @@ class BaseTrainer(ABC):
         logger.info(shape_str)
 
         # ref = None
+        ref = ref_name
         if ref is None:
             logger.info('Not computing score')
             return 1
