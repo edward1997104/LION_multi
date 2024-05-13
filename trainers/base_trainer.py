@@ -414,7 +414,7 @@ class BaseTrainer(ABC):
         #     break
         ref_name = get_ref_pt(self.cfg.data.cates, self.cfg.data.type)
         ref = torch.load(ref_name)
-        mean, std  = ref['mean'][0:1].to(device), ref['std'][0:1].to(device)
+        mean, std = ref['mean'][0:1].to(device), ref['std'][0:1].to(device)
 
         sample_num_points = self.cfg.data.tr_max_sample_points
         cates = self.cfg.data.cates
@@ -500,7 +500,7 @@ class BaseTrainer(ABC):
                                 device_str=device.type,
                                 for_vis=False,
                                 ddim_step=ddim_step).permute(0, 2, 1).contiguous()  # B,3,N->B,N,3
-                x = x * std + mean
+
 
                 assert(
                     x.shape[-1] == input_dim), f'expect x: B,N,{input_dim}; get {x.shape}'
@@ -521,12 +521,13 @@ class BaseTrainer(ABC):
                         gen_pcs.shape, self.args.global_rank)
         logger.info('save as %s' % output_name)
         if self.args.global_rank == 0:
+            gen_pcs_scaled = gen_pcs * std + mean
             for idx in range(gen_pcs.shape[0]):
                 save_pcs_dir = os.path.join(
                     self.cfg.save_dir, f'sample_pcs_{ddim_step}')
                 os.makedirs(save_pcs_dir, exist_ok=True)
                 path = os.path.join(save_pcs_dir, f'{idx}.ply')
-                save_ply_file(gen_pcs[idx].cpu().numpy(), path)
+                save_ply_file(gen_pcs_scaled[idx].cpu().numpy(), path)
                 print("Saved sample file: ", path)
 
             torch.save(gen_pcs, output_name)
@@ -552,7 +553,7 @@ class BaseTrainer(ABC):
         shape_str = '{}: gen_pcs: {}'.format(self.cfg.save_dir, gen_pcs.shape)
         logger.info(shape_str)
 
-        ref = None
+        # ref = None
         if ref is None:
             logger.info('Not computing score')
             return 1

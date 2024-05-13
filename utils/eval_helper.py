@@ -265,55 +265,6 @@ def compute_score(output_name, ref_name, batch_size_test=256, device_str='cuda',
         ref_pcs = ref_pcs * s_pcs + m_pcs
         gen_pcs = gen_pcs * s_pcs + m_pcs
     # visualize first few samples:
-    if VIS:
-        if exp is not None:
-            exp = exp
-        elif writer is not None:
-            exp = writer.exp
-        elif os.path.exists('.comet_api'):
-            comet_args = json.load(open('.comet_api', 'r'))
-            exp = Experiment(display_summary_level=0,
-                            **comet_args)
-        else:
-            exp = OfflineExperiment(offline_directory="/tmp")
-        img_list = []
-        gen_list = []
-        ref_list = []
-        for i in range(20):
-            NORM_VIS = 0
-            if NORM_VIS:
-                norm_ref, norm_gen = normalize_point_clouds([
-                    ref_pcs[i], gen_pcs[i]])
-            else:
-                norm_ref = ref_pcs[i]
-                norm_gen = gen_pcs[i]
-            ref_img = visualize_point_clouds_3d([norm_ref],
-                                                [f'ref-{i}'], bound=1.0)  # 0.8)
-            gen_img = visualize_point_clouds_3d([norm_gen],
-                                                [f'gen-{i}'], bound=1.0)  # 0.8)
-            ref_list.append(torch.as_tensor(ref_img) / 255.0)
-            gen_list.append(torch.as_tensor(gen_img) / 255.0)
-            img_list.append(ref_list[-1])
-            img_list.append(gen_list[-1])
-
-        path = output_name.replace('.pt', '_eval.png')
-
-        grid = torchvision.utils.make_grid(gen_list)
-        # to 3,H,W to H,W,3
-        ndarr = grid.mul(255).add_(0.5).clamp_(0, 255).permute(
-            1, 2, 0).to('cpu', torch.uint8).numpy()
-        exp.log_image(ndarr, 'samples')
-
-        ref_grid = torchvision.utils.make_grid(ref_list)
-        # to 3,H,W to H,W,3
-        ref_ndarr = ref_grid.mul(255).add_(0.5).clamp_(0, 255).permute(
-            1, 2, 0).to('cpu', torch.uint8).numpy()
-        ndarr = np.concatenate([ndarr, ref_ndarr], axis=0)
-        exp.log_image(ndarr, 'samples_vs_ref')
-
-        torchvision.utils.save_image(img_list, path)
-        logger.info(exp.url)
-        logger.info('save vis at {}', path)
     metric2 = 'EMD' if not CD_ONLY else None
     logger.info('print_kwargs: {}', print_kwargs)
     results = compute_all_metrics(gen_pcs.to(device).float(),
@@ -323,12 +274,6 @@ def compute_score(output_name, ref_name, batch_size_test=256, device_str='cuda',
     jsd = jsd_between_point_cloud_sets(
         gen_pcs.cpu().numpy(), ref_pcs.cpu().numpy())
     results['jsd'] = jsd
-    msg = print_results(results, **print_kwargs)
-    # with open('../exp/eval_out.txt', 'a') as f:
-    #     run_time = time.strftime('%m%d-%H%M-%S')
-    #     f.write('<< date: %s >>\n' % run_time)
-    #     f.write('%s\n%s\n' % (exp.url, msg))
-    results['url'] = exp.url
     if not skip_write:
         os.makedirs('results', exist_ok=True)
         msg = write_results(
